@@ -106,15 +106,15 @@ void drv_stop(SoftwareWire * _wire){
 
 
 void vibrate(SoftwareWire * wire, uint8_t n, String message){
-    for(int i=0; i<n; i++)
-        drv_wave(wire, i, atoi(message.charAt(2 + i)));
+    // i=3 because of prefix 
+    for(int i=3; i<n; i++)
+        // i+1 to skip the comma
+        drv_wave(wire, i, int(message.charAt(i + 1)));
 
     // close up sequence
     drv_wave(wire, n + 1 , 0);
     drv_go(wire);
     
-    Serial.print('k');
-    Serial.println(n);
 }
 
 // buffer incoming messages
@@ -174,7 +174,10 @@ void parse(String message){
         uint8_t value = (byte)message.charAt(1);
         int mapped = map(value, 0, 255, -28, 30);
 
+    // message is for haptic subsystem
     } else if(message.charAt(0) == 'h'){
+        Serial.print('k');
+        Serial.println(message);
         uint8_t which = atoi(message.charAt(1));
         uint8_t n = atoi(message.charAt(2));
 
@@ -186,7 +189,7 @@ void parse(String message){
 
         else if(which == 2)
             vibrate(&wire2, n, message);
-        
+
 
     }
 }
